@@ -103,7 +103,7 @@ fn get_libmpv() {
         .wait()
         .expect("mpv-build build failed");
 
-    std::env::set_var("MPV_SOURCE", mpv_src);
+    std::env::set_var("MPV_SOURCE", &mpv_src);
 
     #[cfg(not(target_os = "windows"))]
     {
