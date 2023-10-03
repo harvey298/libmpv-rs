@@ -19,7 +19,7 @@
 #[cfg(feature = "build_libmpv")]
 use std::env;
 
-#[cfg(all(feature = "build_libmpv", not(target_os = "windows")))]
+// #[cfg(all(feature = "build_libmpv", not(target_os = "windows")))]
 use std::process::Command;
 
 #[cfg(not(feature = "build_libmpv"))]
@@ -27,6 +27,8 @@ fn main() {}
 
 #[cfg(all(feature = "build_libmpv", target_os = "windows"))]
 fn main() {
+    #[cfg(feature = "grab_libmpv")] get_libmpv();
+
     let source = env::var("MPV_SOURCE").expect("env var `MPV_SOURCE` not set");
 
     if env::var("CARGO_CFG_TARGET_POINTER_WIDTH").unwrap() == "64" {
@@ -38,6 +40,8 @@ fn main() {
 
 #[cfg(all(feature = "build_libmpv", not(target_os = "windows")))]
 fn main() {
+    #[cfg(feature = "grab_libmpv")] get_libmpv();
+
     let source = env::var("MPV_SOURCE").expect("env var `MPV_SOURCE` not set");
     let num_threads = env::var("NUM_JOBS").unwrap();
 
@@ -76,4 +80,45 @@ fn main() {
         .expect("mpv-build build failed");
 
     println!("cargo:rustc-link-search={}/mpv/build/", source);
+}
+
+
+fn get_libmpv() {
+    #[cfg(not(target_os = "windows"))]
+    let url = "https://github.com/mpv-player/mpv-build.git";
+
+    #[cfg(target_os = "windows")]
+    let url = "https://github.com/mpv-player/mpv";
+
+    let out_dir = std::env::var("OUT_DIR").unwrap();
+
+    let mpv_src = format!("{out_dir}/mpv_src/");
+
+    Command::new("git")
+        .arg("clone")
+        .arg(&url)
+        .arg(&mpv_src)
+        .spawn()
+        .expect("mpv-build build failed")
+        .wait()
+        .expect("mpv-build build failed");
+
+    std::env::set_var("MPV_SOURCE", mpv_src);
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let parent = mpv_src;
+        let ffmpeg_master = format!("{parent}use-ffmpeg-master");
+        let libplacebo_master = format!("{parent}use-libplacebo-master");
+        let mpv_master = format!("{parent}use-mpv-master");
+        let build = format!("{parent}build");
+        
+        // Build libmpv
+        Command::new("printf").arg("\"%s\n\"").arg("-Dlibmpv=true").arg(">").arg("mpv_options").spawn().wait().expect("mpv-build build failed");
+
+        Command::new(ffmpeg_master).spawn().wait().expect("mpv-build build failed");
+        Command::new(libplacebo_master).spawn().wait().expect("mpv-build build failed");
+        Command::new(mpv_master).spawn().wait().expect("mpv-build build failed");
+        Command::new(build).spawn().wait().expect("mpv-build build failed");
+    }
 }

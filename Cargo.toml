@@ -41,7 +41,8 @@ crossbeam = "0.7"
 default = ["protocols", "render"]
 protocols = [] # Enable custom protocol callbacks
 render = [] # Enable custom rendering
-build_libmpv = [] # build libmpv automatically, provided MPV_SOURCE is set
+grab_libmpv = ["build_libmpv"]
+build_libmpv = ["libmpv-sys/bindgen"] # build libmpv automatically, provided MPV_SOURCE is set
 
 [badges]
 travis-ci = { repository = "https://github.com/ParadoxSpiral/mpv-rs", branch = "master" } 
