@@ -116,9 +116,9 @@ fn get_libmpv() {
         // Build libmpv
         Command::new("printf").arg("\"%s\n\"").arg("-Dlibmpv=true").arg(">").arg("mpv_options").spawn().wait().expect("mpv-build build failed");
 
-        Command::new(ffmpeg_master).spawn().wait().expect("mpv-build build failed");
-        Command::new(libplacebo_master).spawn().wait().expect("mpv-build build failed");
-        Command::new(mpv_master).spawn().wait().expect("mpv-build build failed");
-        Command::new(build).spawn().wait().expect("mpv-build build failed");
+        Command::new(ffmpeg_master).spawn().unwrap().wait().expect("mpv-build build failed");
+        Command::new(libplacebo_master).spawn().unwrap().wait().expect("mpv-build build failed");
+        Command::new(mpv_master).spawn().unwrap().wait().expect("mpv-build build failed");
+        Command::new(build).spawn().unwrap().wait().expect("mpv-build build failed");
     }
 }
