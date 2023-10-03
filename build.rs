@@ -114,7 +114,7 @@ fn get_libmpv() {
         let build = format!("{parent}build");
         
         // Build libmpv
-        Command::new("printf").arg("\"%s\n\"").arg("-Dlibmpv=true").arg(">").arg("mpv_options").spawn().wait().expect("mpv-build build failed");
+        Command::new("printf").arg("\"%s\n\"").arg("-Dlibmpv=true").arg(">").arg("mpv_options").spawn().unwrap().wait().expect("mpv-build build failed");
 
         Command::new(ffmpeg_master).spawn().unwrap().wait().expect("mpv-build build failed");
         Command::new(libplacebo_master).spawn().unwrap().wait().expect("mpv-build build failed");
